@@ -1,0 +1,40 @@
+# sample_contribution.py - Simple utility for Gittensor miners
+# Push this to a whitelisted repo for verifiable contributions [web:55]
+
+"""
+File size calculator with progress bar for large directories.
+Useful for DePIN operators monitoring storage nodes (e.g., Storj).
+"""
+
+import os
+import sys
+from tqdm import tqdm
+
+def calculate_directory_size(path: str) -> int:
+    """Calculate total size of directory in bytes with progress."""
+    total_size = 0
+    file_count = 0
+    
+    for root, dirs, files in os.walk(path):
+        for file in tqdm(files, desc=f"Scanning {root}", leave=False):
+            file_path = os.path.join(root, file)
+            try:
+                total_size += os.path.getsize(file_path)
+                file_count += 1
+            except OSError:
+                continue
+    
+    print(f"\n📁 {path}: {file_count:,} files, {total_size / (1024**3):.2f} GB")
+    return total_size
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: python sample_contribution.py /path/to/dir")
+        sys.exit(1)
+    
+    path = sys.argv[1]
+    if not os.path.isdir(path):
+        print("❌ Error: Path is not a directory")
+        sys.exit(1)
+    
+    calculate_directory_size(path)
